@@ -7,19 +7,18 @@ int main() {
     int testCase{};
     cin >> testCase;
 
-    int 
-        path[4]{},
-        numPlanet{},
-        **planetInfo{},
-        startDistSqr{},
-        finishDistSqr{},
-        rangeSqr{};
+    int path[4]{},
+            numPlanet{},
+            **planetInfo{},
+            startDistSqr{},
+            finishDistSqr{},
+            rangeSqr{};
 
     vector<int> res{};
 
     for(int i = 0; i < testCase; i++) {
-        for(int j = 0; j < 4; j++) {
-            cin >> path[j];
+        for(int & j : path) {
+            cin >> j;
         }
 
         cin >> numPlanet;
@@ -34,7 +33,9 @@ int main() {
             }
         }
 
-        int passCount{};
+        int passCount{0};
+        bool posStart{},
+                posFinish{};
 
         for(int j = 0; j < numPlanet; j++) {
             startDistSqr = (path[0] - planetInfo[j][0]) * (path[0] - planetInfo[j][0]) +
@@ -42,11 +43,19 @@ int main() {
             finishDistSqr = (path[2] - planetInfo[j][0]) * (path[2] - planetInfo[j][0]) +
                             (path[3] - planetInfo[j][1]) * (path[3] - planetInfo[j][1]);
             rangeSqr = planetInfo[j][2] * planetInfo[j][2];
-            
-            if((startDistSqr - rangeSqr) * (finishDistSqr - rangeSqr) < 0) {
+
+            posStart = startDistSqr <= rangeSqr;
+            posFinish = finishDistSqr <= rangeSqr;
+
+            if(posStart != posFinish) {
                 passCount++;
             }
         }
+
+        for(int j = 0; j < numPlanet; j++) {
+            delete[] planetInfo[j];
+        }
+        delete[] planetInfo;
 
         res.push_back(passCount);
     }
