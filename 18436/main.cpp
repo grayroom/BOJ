@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <vector>
 
 using namespace std;
@@ -11,10 +12,13 @@ int main() {
     int N{};
     scanf("%d", &N);
 
+    int h{(int)ceil(log2(N))};
+    int tree_size = (1 << (h + 1));
+
     vector<int> a(N + 1),
-                tree(2 * N);
-    for(int i = 1; i <= N; ++i) { // 배열 a를 tree 형태로 접근하기 위해 index가 0인 원소는 사용하지 않는다.
-        scanf("%d", &a[i]);
+                tree(tree_size);
+    for(int i = 0; i < N; ++i) { // 배열 a를 tree 형태로 접근하기 위해 index가 0인 원소는 사용하지 않는다.
+        scanf("%d", &a[i + 1]);
     }
     init(a, tree, 1, 1, N);
 
@@ -27,7 +31,15 @@ int main() {
 
         switch(query) {
             case 1: {
-                update(tree, 1, 1, N + 1, left, right % 2 - tree[left] % 2);
+                if(right % 2 == a[left] % 2) { // 이 경우에는 실제로 값을 바꾸지 않아도 결과값에 차이가 없다.
+                    break;
+                } else if (a[left] % 2 == 1 && right % 2 == 0) { // 홀수값을 짝수로 바꾸는 경우
+                    a[left] = right;
+                    update(tree, 1, 1, N, left, -1);
+                } else { // 짝수값을 홀수로 바꾸는 경우
+                    a[left] = right;
+                    update(tree, 1, 1, N, left, +1);
+                }
             } break;
             case 2: {
                 printf("%d\n", right - left + 1 - sum(tree, 1, 1, N, left, right));
