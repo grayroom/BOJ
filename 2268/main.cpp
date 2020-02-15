@@ -4,9 +4,9 @@
 
 using namespace std;
 
-int init(int* a, int* tree, int node, int start, int end);
-long long sum(int* tree, int node, int start, int end, int left, int right);
-void update(int* tree, int node, int start, int end, int index, int diff);
+int init(long long* a, long long* tree, int node, int start, int end);
+long long sum(long long* tree, int node, int start, int end, int left, int right);
+void update(long long* tree, int node, int start, int end, int index, int diff);
 
 int main() {
     int N{}, M{};
@@ -15,11 +15,8 @@ int main() {
     int h{(int)ceil(log2(N))};
     int tree_size = (1 << (h + 1));
 
-    int* a = new int[N + 1]{};
-    int* tree = new int[tree_size + 1]{};
-    // for(int i = 0; i < N; ++i) {
-    //     scanf("%lld", &a[i + 1]);
-    // }
+    long long* a = new long long[N + 1]{0};
+    long long* tree = new long long[tree_size]{0};
     init(a, tree, 1, 1, N);
 
     while(M--) {
@@ -36,10 +33,11 @@ int main() {
                 printf("%lld\n", sum(tree, 1, 1, N, left, right));
             } break;
             case 1: {
-                int index{}, newVal{};
+                int index{}, newVal{}, diff{};
                 scanf("%d %d", &index, &newVal);
-                update(tree, 1, 1, N, index, newVal - a[index]);
+                diff = newVal - a[index];
                 a[index] = newVal;
+                update(tree, 1, 1, N, index, diff);
             } break;
             default: break;
         }
@@ -48,7 +46,7 @@ int main() {
     return 0;
 }
 
-int init(int* a, int* tree, int node, int start, int end) {
+int init(long long* a, long long* tree, int node, int start, int end) {
     if(start == end) {
         return tree[node] = a[start];
     } else {
@@ -57,7 +55,7 @@ int init(int* a, int* tree, int node, int start, int end) {
     }
 }
 
-long long sum(int* tree, int node, int start, int end, int left, int right) {
+long long sum(long long* tree, int node, int start, int end, int left, int right) {
     if(left > end || right < start) {
         return 0;
     }
@@ -68,7 +66,7 @@ long long sum(int* tree, int node, int start, int end, int left, int right) {
            sum(tree, node * 2 + 1, (start + end) / 2 + 1, end, left, right);
 }
 
-void update(int* tree, int node, int start, int end, int index, int diff) {
+void update(long long* tree, int node, int start, int end, int index, int diff) {
     if(index < start || index > end) {
         return;
     }
