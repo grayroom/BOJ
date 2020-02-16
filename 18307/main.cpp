@@ -8,7 +8,7 @@ class House {
     public:
     int posX{};
     int posY{};
-    vector<House*> childHosue{};
+    vector<House&> childHouse{};
 
     House(int posX, int posY) {this->posX = posX; this->posY = posY;}
 };
@@ -30,7 +30,9 @@ int main() {
 void init(vector<House>& houseList) {
     for(House houseMain : houseList) {
         for(House houseSub : houseList) {
-            if(sqrt(3) * (houseMain.posY - houseSub.posY) <= abs(houseMain.posX - houseSub.posX))
+            if(sqrt(3) * (houseMain.posY - houseSub.posY) <= abs(houseMain.posX - houseSub.posX)) {
+                houseMain.childHouse.push_back(houseSub);
+            }
         }
     }
 }
