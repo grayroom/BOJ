@@ -2,13 +2,14 @@
 #include <vector>
 #include <algorithm>
 
-inline void build(vector<int>& tree, int N);
-inline int getMin(int left, int right);
-
 using namespace std;
 
+inline void build(vector<int>& tree, int N);
+inline int getMin(vector<int>&tree, int N, int left, int right);
+
+
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(NULL);    
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
 
     int N{}, L{};
     cin >> N >> L;
@@ -30,7 +31,7 @@ int main() {
 
 inline void build(vector<int>& tree, int N) {
     for(int i = N - 1; i > 0; --i) {
-        tree[i] = tree[i << 1] + tree[i << 1 | 1];
+        tree[i] = min(tree[i << 1], tree[i << 1 | 1]);
     }
 }
 
@@ -41,11 +42,11 @@ inline int getMin(vector<int>& tree, int N, int left, int right) {
         if(left == right) {
             return res = min(res, tree[left]);
         }
-        if(left & 1) {
-            res = min(res, tree[left]), ++left;
+        if(left % 2 == 1) {
+            res = min(res, tree[left++]);
         }
-        if(right & 1) {
-            res = min(res, tree[right]), ++right;
+        if(right % 2 == 0) {
+            res = min(res, tree[right--]);
         }
     }
 
