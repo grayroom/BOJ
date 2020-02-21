@@ -6,7 +6,8 @@
 using namespace std;
 
 int init(vector<int>& a, vector<int>& tree, int node, int start, int end);
-void update(vector<int>& tree, vector<int>& a, int node, int start, int end, int index, int val);
+int getMin(vector<int>& tree, int node, int start, int end, int left, int right);
+void update(vector<int>& tree, int node, int start, int end, int index, int newVal);
 
 int main() {
     int N{};
@@ -17,7 +18,7 @@ int main() {
 
     vector<int> a(N + 1),
             tree(tree_size);
-    for(int i = 0; i < N; ++i) { // 배열 a를 tree 형태로 접근하기 위해 index가 0인 원소는 사용하지 않는다.
+    for(int i = 0; i < N; ++i) {
         scanf("%d", &a[i + 1]);
     }
     init(a, tree, 1, 1, N);
@@ -26,18 +27,15 @@ int main() {
     scanf("%d", &M);
 
     while(M--) {
-        int query{};
-        scanf("%d", &query);
+        int query{}, left{}, right{}, diff{};
+        scanf("%d %d %d", &query, &left, &right);
 
         switch(query) {
             case 1: {
-                int index{}, newVal{};
-                scanf("%d %d", &index, &newVal);
-                a[index] = newVal;
-                update(tree, a, 1, 1, N, index, newVal);
+                update(tree, 1, 1, N, left, right);
             } break;
             case 2: {
-                printf("%d\n", tree[1]);
+                cout << getMin(tree, 1, 1, N, left, right);
             } break;
             default: break;
         }
@@ -47,33 +45,36 @@ int main() {
 }
 
 int init(vector<int>& a, vector<int>& tree, int node, int start, int end) {
-    if(start == end) { // leaf node에는 해당원소가 짝수인지 여부를 저장한다.
-        return tree[node] = start;
-    } else { // leaf node가 아닌 node에는 자식 node 중, "홀수인 node의 개수"가 저장된다.
-        int left{init(a, tree, node * 2, start, (start + end) / 2)},
-            right{init(a, tree, node * 2 + 1, (start + end) / 2 + 1 , end)};
-
-        if(a[left] > a[right]) {
-            return tree[node] = right;
-        } else if(a[right] > a[left]) {
-            return tree[node] = left;
-        } else {
-            return tree[node] = min(left, right);
-        }
+    if(start == end) {
+        return tree[node] = a[start] % 2;
+    } else {
+        return tree[node] = min(init(a, tree, node * 2, start, (start + end) / 2),
+                            init(a, tree, node * 2 + 1, (start + end) / 2 + 1 , end));
     }
 }
 
-void update(vector<int>& tree, vector<int>& a, int node, int start, int end, int index, int val) {
+int getMin(vector<int>& tree, int node, int start, int end, int left, int right) {
+    if(left > end || right < start) {
+        return numeric_limits<int>::max();
+    }
+    if(left <= start && end <= right) {
+        return tree[node];
+    }
+    return min(getMin(tree, node * 2, start, (start + end) / 2, left, right),
+               getMin(tree, node * 2 + 1, (start + end) / 2 + 1, end, left, right));
+}
+
+void update(vector<int>& tree, int node, int start, int end, int index, int newVal) {
     if(index < start || index > end) {
         return;
     }
 
-    if(val < a[node]) {
-        tree[node] = index;
+    if(newVal < tree[node]) {
+        tree[node] = newVal;
     }
 
     if(start != end) {
-        update(tree, a, node * 2, start, (start + end) / 2, index, val);
-        update(tree, a, node * 2 + 1, (start + end) / 2 + 1, end, index, val);
+        update(tree, node * 2, start, (start + end) / 2, index, newVal);
+        update(tree, node * 2 + 1, (start + end) / 2 + 1, end, index, newVal);
     }
 }
